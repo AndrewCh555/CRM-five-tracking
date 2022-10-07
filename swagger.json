@@ -1,0 +1,1222 @@
+{
+  "openapi": "3.0.0",
+  "paths": {
+    "/health": {
+      "get": {
+        "operationId": "HealthController_check",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The Health Check is successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": { "type": "string", "example": "ok" },
+                    "info": {
+                      "type": "object",
+                      "example": { "database": { "status": "up" } },
+                      "additionalProperties": {
+                        "type": "object",
+                        "properties": { "status": { "type": "string" } },
+                        "additionalProperties": { "type": "string" }
+                      },
+                      "nullable": true
+                    },
+                    "error": {
+                      "type": "object",
+                      "example": {},
+                      "additionalProperties": {
+                        "type": "object",
+                        "properties": { "status": { "type": "string" } },
+                        "additionalProperties": { "type": "string" }
+                      },
+                      "nullable": true
+                    },
+                    "details": {
+                      "type": "object",
+                      "example": { "database": { "status": "up" } },
+                      "additionalProperties": {
+                        "type": "object",
+                        "properties": { "status": { "type": "string" } },
+                        "additionalProperties": { "type": "string" }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "The Health Check is not successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": { "type": "string", "example": "error" },
+                    "info": {
+                      "type": "object",
+                      "example": { "database": { "status": "up" } },
+                      "additionalProperties": {
+                        "type": "object",
+                        "properties": { "status": { "type": "string" } },
+                        "additionalProperties": { "type": "string" }
+                      },
+                      "nullable": true
+                    },
+                    "error": {
+                      "type": "object",
+                      "example": { "redis": { "status": "down", "message": "Could not connect" } },
+                      "additionalProperties": {
+                        "type": "object",
+                        "properties": { "status": { "type": "string" } },
+                        "additionalProperties": { "type": "string" }
+                      },
+                      "nullable": true
+                    },
+                    "details": {
+                      "type": "object",
+                      "example": {
+                        "database": { "status": "up" },
+                        "redis": { "status": "down", "message": "Could not connect" }
+                      },
+                      "additionalProperties": {
+                        "type": "object",
+                        "properties": { "status": { "type": "string" } },
+                        "additionalProperties": { "type": "string" }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users/me": {
+      "get": {
+        "operationId": "UserController_getMyProfile",
+        "summary": "",
+        "description": "Get profile user",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/UserResponseDto" } } }
+          }
+        },
+        "tags": ["Users"],
+        "security": [{ "bearer": [] }]
+      }
+    },
+    "/users": {
+      "post": {
+        "operationId": "UserController_create",
+        "summary": "",
+        "description": "Create new user",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/CreateUserRequestDto" } } }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/UserResponseDto" } } }
+          },
+          "400": { "description": "Incorrect data." },
+          "500": { "description": "Internal server error" }
+        },
+        "tags": ["Users"],
+        "security": [{ "bearer": [] }]
+      },
+      "get": {
+        "operationId": "UserController_getAll",
+        "summary": "",
+        "description": "Get all user",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "type": "array", "items": { "$ref": "#/components/schemas/UserResponseDto" } }
+              }
+            }
+          }
+        },
+        "tags": ["Users"],
+        "security": [{ "bearer": [] }]
+      }
+    },
+    "/users/{id}": {
+      "put": {
+        "operationId": "UserController_update",
+        "summary": "",
+        "description": "Update user",
+        "parameters": [{ "name": "id", "required": true, "in": "path", "schema": { "type": "string" } }],
+        "requestBody": {
+          "required": true,
+          "content": { "multipart/form-data": { "schema": { "$ref": "#/components/schemas/UpdateUserRequestDto" } } }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/UserResponseDto" } } }
+          },
+          "404": { "description": "There isn't any user with id" },
+          "500": { "description": "Internal server error" }
+        },
+        "tags": ["Users"],
+        "security": [{ "bearer": [] }]
+      },
+      "get": {
+        "operationId": "UserController_findById",
+        "summary": "",
+        "description": "Find by ID user",
+        "parameters": [{ "name": "id", "required": true, "in": "path", "schema": { "type": "string" } }],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/UserResponseDto" } } }
+          },
+          "500": { "description": "Internal server error" }
+        },
+        "tags": ["Users"],
+        "security": [{ "bearer": [] }]
+      },
+      "delete": {
+        "operationId": "UserController_delete",
+        "summary": "",
+        "description": "Delete user",
+        "parameters": [{ "name": "id", "required": true, "in": "path", "schema": { "type": "string" } }],
+        "responses": { "200": { "description": "" }, "404": { "description": "There isn't any user with id" } },
+        "tags": ["Users"],
+        "security": [{ "bearer": [] }]
+      }
+    },
+    "/users/byIds": {
+      "delete": {
+        "operationId": "UserController_deleteByIds",
+        "summary": "",
+        "description": "Delete users",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/DeleteByIdsRequestDto" } } }
+        },
+        "responses": {
+          "200": {
+            "description": "Undeleted ids",
+            "content": {
+              "application/json": { "schema": { "type": "array", "items": { "$ref": "#/components/schemas/" } } }
+            }
+          },
+          "404": { "description": "There isn't any user with id" }
+        },
+        "tags": ["Users"],
+        "security": [{ "bearer": [] }]
+      }
+    },
+    "/users/search": {
+      "get": {
+        "operationId": "UserController_search",
+        "summary": "",
+        "description": "Search users",
+        "parameters": [
+          { "name": "name (first or last)", "required": true, "in": "query", "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "type": "array", "items": { "$ref": "#/components/schemas/UserResponseDto" } }
+              }
+            }
+          }
+        },
+        "tags": ["Users"],
+        "security": [{ "bearer": [] }]
+      }
+    },
+    "/users/save-last-session": {
+      "post": {
+        "operationId": "UserController_saveLastSessionDateTime",
+        "summary": "",
+        "description": "Update session date and time",
+        "parameters": [],
+        "responses": { "200": { "description": "" }, "500": { "description": "Internal server error" } },
+        "tags": ["Users"],
+        "security": [{ "bearer": [] }]
+      }
+    },
+    "/departments": {
+      "post": {
+        "operationId": "DepartmentController_create",
+        "summary": "",
+        "description": "Create new department",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/CreateDepartmentRequestDto" } } }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/DepartmentResponseDto" } } }
+          },
+          "400": { "description": "Incorrect data." },
+          "500": { "description": "Internal server error" }
+        },
+        "tags": ["Departments"],
+        "security": [{ "bearer": [] }]
+      },
+      "get": {
+        "operationId": "DepartmentController_getAll",
+        "summary": "",
+        "description": "Get all department",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "type": "array", "items": { "$ref": "#/components/schemas/DepartmentResponseDto" } }
+              }
+            }
+          }
+        },
+        "tags": ["Departments"],
+        "security": [{ "bearer": [] }]
+      }
+    },
+    "/departments/{id}": {
+      "get": {
+        "operationId": "DepartmentController_getById",
+        "summary": "",
+        "description": "Find by ID department",
+        "parameters": [{ "name": "id", "required": true, "in": "path", "schema": { "type": "string" } }],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/DepartmentResponseDto" } } }
+          },
+          "500": { "description": "Internal server error" }
+        },
+        "tags": ["Departments"],
+        "security": [{ "bearer": [] }]
+      },
+      "put": {
+        "operationId": "DepartmentController_update",
+        "summary": "",
+        "description": "Update by ID department",
+        "parameters": [{ "name": "id", "required": true, "in": "path", "schema": { "type": "string" } }],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/CreateDepartmentRequestDto" } } }
+        },
+        "responses": { "500": { "description": "Internal server error" } },
+        "tags": ["Departments"],
+        "security": [{ "bearer": [] }]
+      },
+      "delete": {
+        "operationId": "DepartmentController_delete",
+        "summary": "",
+        "description": "Delete department",
+        "parameters": [{ "name": "id", "required": true, "in": "path", "schema": { "type": "string" } }],
+        "responses": { "204": { "description": "" } },
+        "tags": ["Departments"],
+        "security": [{ "bearer": [] }]
+      }
+    },
+    "/projects": {
+      "get": {
+        "operationId": "ProjectController_getAll",
+        "summary": "",
+        "description": "Get all project",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "type": "array", "items": { "$ref": "#/components/schemas/ProjectResponseDto" } }
+              }
+            }
+          }
+        },
+        "tags": ["Projects"],
+        "security": [{ "bearer": [] }]
+      },
+      "post": {
+        "operationId": "ProjectController_create",
+        "summary": "",
+        "description": "Create new project",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": { "multipart/form-data": { "schema": { "$ref": "#/components/schemas/CreateProjectRequestDto" } } }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ProjectResponseDto" } } }
+          },
+          "500": { "description": "Internal server error" }
+        },
+        "tags": ["Projects"],
+        "security": [{ "bearer": [] }]
+      }
+    },
+    "/projects/{id}": {
+      "get": {
+        "operationId": "ProjectController_findById",
+        "summary": "",
+        "description": "Find by ID project",
+        "parameters": [{ "name": "id", "required": true, "in": "path", "schema": { "type": "string" } }],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ProjectResponseDto" } } }
+          },
+          "404": { "description": "There isn't any project with id" }
+        },
+        "tags": ["Projects"],
+        "security": [{ "bearer": [] }]
+      },
+      "put": {
+        "operationId": "ProjectController_update",
+        "summary": "",
+        "description": "Update project",
+        "parameters": [{ "name": "id", "required": true, "in": "path", "schema": { "type": "string" } }],
+        "requestBody": {
+          "required": true,
+          "content": { "multipart/form-data": { "schema": { "$ref": "#/components/schemas/UpdateProjectRequestDto" } } }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ProjectResponseDto" } } }
+          },
+          "404": { "description": "There isn't any project with id" },
+          "500": { "description": "Internal server error" }
+        },
+        "tags": ["Projects"],
+        "security": [{ "bearer": [] }]
+      },
+      "delete": {
+        "operationId": "ProjectController_delete",
+        "summary": "",
+        "description": "Delete project",
+        "parameters": [{ "name": "id", "required": true, "in": "path", "schema": { "type": "string" } }],
+        "responses": { "200": { "description": "" }, "404": { "description": "There isn't any project with id" } },
+        "tags": ["Projects"],
+        "security": [{ "bearer": [] }]
+      }
+    },
+    "/projects/search": {
+      "get": {
+        "operationId": "ProjectController_search",
+        "summary": "",
+        "description": "Search Project",
+        "parameters": [{ "name": "Project name", "required": true, "in": "query", "schema": { "type": "string" } }],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "type": "array", "items": { "$ref": "#/components/schemas/ProjectResponseDto" } }
+              }
+            }
+          }
+        },
+        "tags": ["Projects"],
+        "security": [{ "bearer": [] }]
+      }
+    },
+    "/auth/registration": {
+      "post": {
+        "operationId": "AuthController_register",
+        "summary": "",
+        "description": "Registration",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/SignUpRequestDto" } } }
+        },
+        "responses": {
+          "200": {
+            "description": "Successfully created user",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/UserResponseDto" } } }
+          },
+          "400": { "description": "Incorrect registration data." },
+          "500": { "description": "Internal server error" }
+        },
+        "tags": ["Authentication"]
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "operationId": "AuthController_login",
+        "summary": "",
+        "description": "Login",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/SignInRequestDto" } } }
+        },
+        "responses": { "200": { "description": "" } },
+        "tags": ["Authentication"]
+      }
+    },
+    "/auth/refresh": {
+      "get": {
+        "operationId": "AuthController_refresh",
+        "summary": "",
+        "description": "Refresh",
+        "parameters": [],
+        "responses": { "200": { "description": "" } },
+        "tags": ["Authentication"],
+        "security": [{ "bearer": [] }]
+      }
+    },
+    "/auth/password-change": {
+      "post": {
+        "operationId": "AuthController_passwordChange",
+        "summary": "",
+        "description": "Password change",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/UpdatePasswordRequestDto" } } }
+        },
+        "responses": { "200": { "description": "" } },
+        "tags": ["Authentication"],
+        "security": [{ "bearer": [] }]
+      }
+    },
+    "/clients": {
+      "post": {
+        "operationId": "ClientController_create",
+        "summary": "",
+        "description": "Create new client",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": { "multipart/form-data": { "schema": { "$ref": "#/components/schemas/CreateClientRequestDto" } } }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ClientResponseDto" } } }
+          },
+          "400": { "description": "Incorrect data." },
+          "500": { "description": "Internal server error" }
+        },
+        "tags": ["Clients"],
+        "security": [{ "bearer": [] }]
+      },
+      "get": {
+        "operationId": "ClientController_getAll",
+        "summary": "",
+        "description": "Get all clients",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "type": "array", "items": { "$ref": "#/components/schemas/ClientResponseDto" } }
+              }
+            }
+          }
+        },
+        "tags": ["Clients"],
+        "security": [{ "bearer": [] }]
+      }
+    },
+    "/clients/{id}": {
+      "put": {
+        "operationId": "ClientController_update",
+        "summary": "",
+        "description": "Update client",
+        "parameters": [{ "name": "id", "required": true, "in": "path", "schema": { "type": "string" } }],
+        "requestBody": {
+          "required": true,
+          "content": { "multipart/form-data": { "schema": { "$ref": "#/components/schemas/UpdateClientRequestDto" } } }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ClientResponseDto" } } }
+          },
+          "404": { "description": "There isn't any client with id" },
+          "500": { "description": "Internal server error" }
+        },
+        "tags": ["Clients"],
+        "security": [{ "bearer": [] }]
+      },
+      "get": {
+        "operationId": "ClientController_findById",
+        "summary": "",
+        "description": "Find by ID client",
+        "parameters": [{ "name": "id", "required": true, "in": "path", "schema": { "type": "string" } }],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ClientResponseDto" } } }
+          },
+          "500": { "description": "Internal server error" }
+        },
+        "tags": ["Clients"],
+        "security": [{ "bearer": [] }]
+      },
+      "delete": {
+        "operationId": "ClientController_delete",
+        "summary": "",
+        "description": "Delete client",
+        "parameters": [{ "name": "id", "required": true, "in": "path", "schema": { "type": "string" } }],
+        "responses": { "200": { "description": "" }, "404": { "description": "There isn't any client with id" } },
+        "tags": ["Clients"],
+        "security": [{ "bearer": [] }]
+      }
+    },
+    "/clients/search": {
+      "get": {
+        "operationId": "ClientController_search",
+        "summary": "",
+        "description": "Search Client",
+        "parameters": [{ "name": "search", "required": true, "in": "query", "schema": { "type": "string" } }],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "type": "array", "items": { "$ref": "#/components/schemas/ClientResponseDto" } }
+              }
+            }
+          }
+        },
+        "tags": ["Clients"],
+        "security": [{ "bearer": [] }]
+      }
+    },
+    "/loggedDays": {
+      "get": {
+        "operationId": "LoggedDayController_find",
+        "summary": "",
+        "description": "Find logged days",
+        "parameters": [
+          {
+            "name": "dateFrom",
+            "required": false,
+            "in": "query",
+            "description": "Choose \"Date from\" (rrrr-mm-dd)",
+            "schema": { "format": "date-time", "type": "string" }
+          },
+          {
+            "name": "dateTo",
+            "required": false,
+            "in": "query",
+            "description": "Choose \"Date to\" (rrrr-mm-dd)",
+            "schema": { "format": "date-time", "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "type": "array", "items": { "$ref": "#/components/schemas/GetLoggedDaysFilterRequestDto" } }
+              }
+            }
+          }
+        },
+        "tags": ["loggedDays"],
+        "security": [{ "bearer": [] }]
+      },
+      "post": {
+        "operationId": "LoggedDayController_create",
+        "summary": "",
+        "description": "Create new logged day",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/CreateLoggedDayRequestDto" } } }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/CreateLoggedDayResponseDto" } }
+            }
+          }
+        },
+        "tags": ["loggedDays"],
+        "security": [{ "bearer": [] }]
+      }
+    },
+    "/loggedDays/{id}": {
+      "get": {
+        "operationId": "LoggedDayController_findById",
+        "summary": "",
+        "description": "Find by ID logged day",
+        "parameters": [{ "name": "id", "required": true, "in": "path", "schema": { "type": "string" } }],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/CreateLoggedDayResponseDto" } }
+            }
+          },
+          "500": { "description": "Internal server error" }
+        },
+        "tags": ["loggedDays"],
+        "security": [{ "bearer": [] }]
+      },
+      "put": {
+        "operationId": "LoggedDayController_update",
+        "summary": "",
+        "description": "Update logged day",
+        "parameters": [{ "name": "id", "required": true, "in": "path", "schema": { "type": "string" } }],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/UpdateLoggedDayRequestDto" } } }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/UpdateLoggedDayRequestDto" } }
+            }
+          },
+          "404": { "description": "There isn't any logged day with id" },
+          "500": { "description": "Internal server error" }
+        },
+        "tags": ["loggedDays"],
+        "security": [{ "bearer": [] }]
+      },
+      "delete": {
+        "operationId": "LoggedDayController_delete",
+        "summary": "",
+        "description": "Delete logged day",
+        "parameters": [{ "name": "id", "required": true, "in": "path", "schema": { "type": "string" } }],
+        "responses": {
+          "200": { "description": "" },
+          "404": { "description": "There isn't any logged day with this id" }
+        },
+        "tags": ["loggedDays"],
+        "security": [{ "bearer": [] }]
+      }
+    },
+    "/loggedDays/byIds": {
+      "delete": {
+        "operationId": "LoggedDayController_deleteByIds",
+        "summary": "",
+        "description": "Delete logged days",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/DeleteByIdsRequestDto" } } }
+        },
+        "responses": {
+          "200": {
+            "description": "Undeleted ids",
+            "content": { "application/json": { "schema": { "type": "array", "items": { "type": "object" } } } }
+          }
+        },
+        "tags": ["loggedDays"],
+        "security": [{ "bearer": [] }]
+      }
+    },
+    "/access": {
+      "get": {
+        "operationId": "AccessController_getAll",
+        "summary": "",
+        "description": "Get all accesses",
+        "parameters": [],
+        "responses": { "200": { "description": "" } },
+        "tags": ["Access"],
+        "security": [{ "bearer": [] }]
+      }
+    },
+    "/access/user/{id}": {
+      "put": {
+        "operationId": "AccessController_updateUser",
+        "summary": "",
+        "description": "Update user to admin",
+        "parameters": [{ "name": "id", "required": true, "in": "path", "schema": { "type": "string" } }],
+        "responses": { "200": { "description": "" } },
+        "tags": ["Access"],
+        "security": [{ "bearer": [] }]
+      }
+    },
+    "/access/admin/{id}": {
+      "put": {
+        "operationId": "AccessController_downgradeAdmin",
+        "summary": "",
+        "description": "Downgrade admin to user",
+        "parameters": [{ "name": "id", "required": true, "in": "path", "schema": { "type": "string" } }],
+        "responses": { "200": { "description": "" } },
+        "tags": ["Access"],
+        "security": [{ "bearer": [] }]
+      }
+    },
+    "/statistic": {
+      "get": {
+        "operationId": "StatisticController_getByGrouped",
+        "summary": "",
+        "description": "Get statistic",
+        "parameters": [
+          {
+            "name": "userId",
+            "required": false,
+            "in": "query",
+            "description": "UserId",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "projectId",
+            "required": false,
+            "in": "query",
+            "description": "ProjectId",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "type": "array", "items": { "$ref": "#/components/schemas/StatisticDiagramResponseDto" } }
+              }
+            }
+          }
+        },
+        "tags": ["Statistics"],
+        "security": [{ "bearer": [] }]
+      }
+    },
+    "/statistic/count": {
+      "get": {
+        "operationId": "StatisticController_getCount",
+        "summary": "",
+        "description": "Get count statistic",
+        "parameters": [
+          {
+            "name": "userId",
+            "required": false,
+            "in": "query",
+            "description": "UserId",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "projectId",
+            "required": false,
+            "in": "query",
+            "description": "ProjectId",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/StatisticHeaderResponseDto" } }
+            }
+          }
+        },
+        "tags": ["Statistics"],
+        "security": [{ "bearer": [] }]
+      }
+    },
+    "/jobs": {
+      "get": {
+        "operationId": "JobController_find",
+        "summary": "",
+        "description": "Find all jobs",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "type": "array", "items": { "$ref": "#/components/schemas/JobResponseDto" } }
+              }
+            }
+          }
+        },
+        "tags": ["Jobs"],
+        "security": [{ "bearer": [] }]
+      },
+      "post": {
+        "operationId": "JobController_create",
+        "summary": "",
+        "description": "Create new job",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/JobRequestDto" } } }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/JobResponseDto" } } }
+          }
+        },
+        "tags": ["Jobs"],
+        "security": [{ "bearer": [] }]
+      }
+    },
+    "/jobs/{id}": {
+      "put": {
+        "operationId": "JobController_update",
+        "summary": "",
+        "description": "Update job",
+        "parameters": [{ "name": "id", "required": true, "in": "path", "schema": { "type": "string" } }],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/JobRequestDto" } } }
+        },
+        "responses": {
+          "404": { "description": "There isn't any job with id" },
+          "500": { "description": "Internal server error" }
+        },
+        "tags": ["Jobs"],
+        "security": [{ "bearer": [] }]
+      },
+      "delete": {
+        "operationId": "JobController_delete",
+        "summary": "",
+        "description": "Delete logged day",
+        "parameters": [{ "name": "id", "required": true, "in": "path", "schema": { "type": "string" } }],
+        "responses": {
+          "200": { "description": "" },
+          "404": { "description": "There isn't any logged day with this id" }
+        },
+        "tags": ["Jobs"],
+        "security": [{ "bearer": [] }]
+      }
+    }
+  },
+  "info": { "title": "BACKEND", "description": "REST API", "version": "1.0.0", "contact": {} },
+  "tags": [{ "name": "Time Tracking", "description": "" }],
+  "servers": [],
+  "components": {
+    "securitySchemes": { "bearer": { "scheme": "bearer", "bearerFormat": "JWT", "type": "http" } },
+    "schemas": {
+      "DepartmentResponseDto": {
+        "type": "object",
+        "properties": { "id": { "type": "string" }, "name": { "type": "string" } },
+        "required": ["id", "name"]
+      },
+      "UserResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "email": { "type": "string" },
+          "createdAt": { "type": "string" },
+          "updatedAt": { "type": "string" },
+          "firstName": { "type": "string" },
+          "lastName": { "type": "string" },
+          "role": { "type": "string" },
+          "skills": { "type": "string" },
+          "lastSessionDateTime": { "type": "string" },
+          "avatarPath": { "type": "string" },
+          "phone": { "type": "string" },
+          "department": { "$ref": "#/components/schemas/DepartmentResponseDto" }
+        },
+        "required": [
+          "id",
+          "email",
+          "createdAt",
+          "updatedAt",
+          "firstName",
+          "lastName",
+          "role",
+          "skills",
+          "lastSessionDateTime",
+          "avatarPath",
+          "phone",
+          "department"
+        ]
+      },
+      "CreateUserRequestDto": {
+        "type": "object",
+        "properties": {
+          "email": { "type": "string", "description": "User email", "example": "email@gmail.com" },
+          "firstName": { "type": "string", "description": "User FirstName", "example": "Alex" },
+          "lastName": { "type": "string", "description": "User LastName", "example": "Grabovsky" },
+          "phone": { "type": "string", "description": "User phone number", "example": "+380636479067" }
+        },
+        "required": ["email", "firstName", "lastName", "phone"]
+      },
+      "UpdateUserRequestDto": {
+        "type": "object",
+        "properties": {
+          "firstName": { "type": "string", "description": "User  FirstName", "example": "Alex" },
+          "lastName": { "type": "string", "description": "User LastName", "example": "Bin" },
+          "email": { "type": "string", "description": "User email", "example": "email@gmail.com" },
+          "skills": {
+            "example": [
+              "UI/UX Design (WEB/Mobile)",
+              "Wireframing",
+              "Prototyping",
+              "User Research",
+              "Interaction design",
+              "Responsive Web Design",
+              "CJM"
+            ],
+            "description": "Array of skills",
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "phone": { "type": "string", "description": "User phone number", "example": "+380636479067" },
+          "file": { "type": "string", "format": "binary" },
+          "departmentId": {
+            "type": "string",
+            "description": "Department ID",
+            "example": "7fd524bc-ebaa-4a34-8202-6fa0cb1e3878"
+          }
+        },
+        "required": ["firstName", "lastName", "email", "departmentId"]
+      },
+      "DeleteByIdsRequestDto": {
+        "type": "object",
+        "properties": {
+          "ids": {
+            "example": ["9322c384-fd8e-4a13-80cd-1cbd1ef95ba8", "986dcaf4-c1ea-4218-b6b4-e4fd95a3c28e"],
+            "type": "array",
+            "items": { "type": "string" }
+          }
+        },
+        "required": ["ids"]
+      },
+      "CreateDepartmentRequestDto": {
+        "type": "object",
+        "properties": { "name": { "type": "string", "description": "Department Name", "example": "Design" } },
+        "required": ["name"]
+      },
+      "ClientResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "name": { "type": "string" },
+          "website": { "type": "string" },
+          "avatarPath": { "type": "string" },
+          "createdAt": { "type": "string" }
+        },
+        "required": ["id", "name", "website", "avatarPath", "createdAt"]
+      },
+      "ProjectResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "name": { "type": "string" },
+          "createdAt": { "type": "string" },
+          "imagePath": { "type": "string" },
+          "client": { "$ref": "#/components/schemas/ClientResponseDto" },
+          "users": { "type": "array", "items": { "$ref": "#/components/schemas/UserResponseDto" } }
+        },
+        "required": ["id", "name", "createdAt", "imagePath", "client", "users"]
+      },
+      "CreateProjectRequestDto": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string", "description": "Project Name", "example": "Esta" },
+          "clientId": {
+            "type": "string",
+            "description": "Client ID",
+            "example": "9878f24c-6b96-43cd-a1c4-69c66c875827"
+          },
+          "file": { "type": "string", "format": "binary" },
+          "performerIds": {
+            "example": ["9878f24c-6b96-43cd-a1c4-69c66c875827"],
+            "description": "Array of performer ids",
+            "type": "array",
+            "items": { "type": "string" }
+          }
+        },
+        "required": ["name", "clientId"]
+      },
+      "UpdateProjectRequestDto": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string", "description": "Project Name", "example": "Esta" },
+          "clientId": {
+            "type": "string",
+            "description": "Client ID",
+            "example": "9878f24c-6b96-43cd-a1c4-69c66c875827"
+          },
+          "file": { "type": "string", "format": "binary" },
+          "performerIds": {
+            "example": ["9878f24c-6b96-43cd-a1c4-69c66c875827"],
+            "description": "Array of performer ids",
+            "type": "array",
+            "items": { "type": "string" }
+          }
+        },
+        "required": ["name", "clientId"]
+      },
+      "SignUpRequestDto": {
+        "type": "object",
+        "properties": {
+          "firstName": { "type": "string" },
+          "lastName": { "type": "string" },
+          "email": { "type": "string" },
+          "password": { "type": "string" },
+          "passwordConfirm": { "type": "string" },
+          "phone": { "type": "string" }
+        },
+        "required": ["firstName", "lastName", "email", "password", "passwordConfirm"]
+      },
+      "SignInRequestDto": {
+        "type": "object",
+        "properties": { "email": { "type": "string" }, "password": { "type": "string" } },
+        "required": ["email", "password"]
+      },
+      "UpdatePasswordRequestDto": {
+        "type": "object",
+        "properties": { "oldPassword": { "type": "string" }, "newPassword": { "type": "string" } },
+        "required": ["oldPassword", "newPassword"]
+      },
+      "CreateClientRequestDto": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string", "description": "Client Name", "example": "Alex" },
+          "website": { "type": "string", "description": "Client Name", "example": "esta.com" },
+          "file": { "type": "string", "format": "binary" }
+        },
+        "required": ["name", "website"]
+      },
+      "UpdateClientRequestDto": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string", "description": "Client Name", "example": "Alex" },
+          "website": { "type": "string", "description": "website", "example": "name.com" },
+          "file": { "type": "string", "format": "binary" }
+        },
+        "required": ["name", "website"]
+      },
+      "GetLoggedDaysFilterRequestDto": {
+        "type": "object",
+        "properties": {
+          "dateFrom": { "format": "date-time", "type": "string", "description": "Choose \"Date from\" (rrrr-mm-dd)" },
+          "dateTo": { "format": "date-time", "type": "string", "description": "Choose \"Date to\" (rrrr-mm-dd)" }
+        }
+      },
+      "CreateLoggedDayResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "number" },
+          "hours": { "type": "number" },
+          "minutes": { "type": "number" },
+          "description": { "type": "string" },
+          "userId": { "type": "string" },
+          "projectId": { "type": "string" },
+          "date": { "type": "string" },
+          "user": { "$ref": "#/components/schemas/UserResponseDto" },
+          "project": { "$ref": "#/components/schemas/ProjectResponseDto" },
+          "department": { "$ref": "#/components/schemas/DepartmentResponseDto" },
+          "job": { "type": "string" },
+          "createdAt": { "type": "string" },
+          "updatedAt": { "type": "string" }
+        },
+        "required": [
+          "id",
+          "hours",
+          "minutes",
+          "description",
+          "userId",
+          "projectId",
+          "date",
+          "user",
+          "project",
+          "department",
+          "job",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "CreateLoggedDayRequestDto": {
+        "type": "object",
+        "properties": {
+          "hours": { "type": "number", "description": "hours worked", "example": 2 },
+          "minutes": { "type": "number", "description": "minutes worked", "example": 30 },
+          "description": { "type": "string", "description": "task description", "example": "super hard task" },
+          "projectId": {
+            "type": "string",
+            "description": "project uuid",
+            "example": "cd9d51b5-af60-4736-84ac-f4c6784d69a3"
+          },
+          "jobId": { "type": "string", "description": "job uuid", "example": "cd9d51b5-af60-4736-84ac-f4c6784d69a3" },
+          "date": {
+            "format": "date-time",
+            "type": "string",
+            "description": "day timestamp",
+            "example": "2022-10-06T06:24:38.584Z"
+          }
+        },
+        "required": ["hours", "minutes", "description", "projectId", "jobId", "date"]
+      },
+      "UpdateLoggedDayRequestDto": {
+        "type": "object",
+        "properties": {
+          "hours": { "type": "number", "description": "hours worked", "example": 2 },
+          "minutes": { "type": "number", "description": "minutes worked", "example": 30 },
+          "description": { "type": "string", "description": "task description", "example": "super hard task" },
+          "projectId": {
+            "type": "string",
+            "description": "project uuid",
+            "example": "cd9d51b5-af60-4736-84ac-f4c6784d69a3"
+          },
+          "jobId": { "type": "string", "description": "job uuid", "example": "cd9d51b5-af60-4736-84ac-f4c6784d69a3" },
+          "date": {
+            "format": "date-time",
+            "type": "string",
+            "description": "day timestamp",
+            "example": "2022-10-06T06:24:38.587Z"
+          }
+        },
+        "required": ["hours", "minutes", "description", "projectId", "jobId", "date"]
+      },
+      "StatisticDiagramResponseDto": {
+        "type": "object",
+        "properties": {
+          "date": { "type": "string" },
+          "hours": { "type": "number" },
+          "minutes": { "type": "number" },
+          "name": { "type": "string" },
+          "firstName": { "type": "string" },
+          "lastName": { "type": "string" },
+          "path": { "type": "string" }
+        },
+        "required": ["date", "hours", "minutes", "name", "firstName", "lastName", "path"]
+      },
+      "StatisticHeaderResponseDto": {
+        "type": "object",
+        "properties": {
+          "projectsCount": { "type": "number", "description": "Projects Count", "example": 4 },
+          "usersCount": { "type": "number", "description": "Users Count", "example": 5 },
+          "hours": { "type": "number", "description": "All hours", "example": 124 }
+        },
+        "required": ["projectsCount", "usersCount", "hours"]
+      },
+      "JobResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "number" },
+          "name": { "type": "string" },
+          "createdAt": { "type": "string" },
+          "updatedAt": { "type": "string" }
+        },
+        "required": ["id", "name", "createdAt", "updatedAt"]
+      },
+      "JobRequestDto": { "type": "object", "properties": { "name": { "type": "string", "description": "Job name" } } }
+    }
+  }
+}
